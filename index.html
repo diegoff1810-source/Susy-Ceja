@@ -1,203 +1,311 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Susy, ¿Quieres ser mi San Valentín?</title>
 
 <style>
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
+  :root{ --bg1:#ff9a9e; --bg2:#fad0c4; }
+
+  html, body { height: 100%; margin: 0; }
+  body{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-    overflow: hidden;
-    margin: 0;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    background-attachment: fixed;
+    overflow:hidden;
+    position:relative;
   }
 
-  h1 {
+  h1{
+    color:#fff;
+    text-shadow:2px 2px 5px #000;
+    text-align:center;
+    padding:0 16px;
+    z-index:5;
+  }
+
+  #buttons{
+    margin-top:30px;
+    position:relative;
+    width:100%;
+    height:220px;
+    z-index:6;
+  }
+
+  button{
+    font-size:20px;
+    padding:15px 30px;
+    margin:10px;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    transition: transform .15s ease, box-shadow .15s ease, padding .15s ease;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  #yes{
+    background: linear-gradient(135deg, #28a745, #7CFC00);
+    color:white;
+    font-weight:bold;
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+    animation:pulse 1.2s infinite;
+    position:relative;
+    left:50%;
+    transform:translateX(-50%);
+  }
+
+  #yes:hover{
+    transform:translateX(-50%) scale(1.05);
+    box-shadow:0 14px 32px rgba(0,0,0,.35);
+  }
+
+  @keyframes pulse{
+    0%{transform:translateX(-50%) scale(1)}
+    50%{transform:translateX(-50%) scale(1.04)}
+    100%{transform:translateX(-50%) scale(1)}
+  }
+
+  #no{
+    background:#f44336;
+    color:white;
+    font-weight:bold;
+    position:absolute;
+    left:50%;
+    top:95px;
+    transform:translateX(-50%);
+  }
+
+  #toast{
+    position:fixed;
+    top:20px;
+    background:rgba(0,0,0,.75);
+    color:#fff;
+    padding:12px 18px;
+    border-radius:12px;
+    font-size:16px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease;
+    z-index:20;
+  }
+  #toast.show{opacity:1;}
+
+  #hearts{ position:fixed; inset:0; overflow:hidden; z-index:2; pointer-events:none; }
+  .heart{
+    position:absolute;
+    bottom:-40px;
+    font-size:22px;
+    opacity:.9;
+    animation:floatUp linear forwards;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,.2));
+  }
+
+  @keyframes floatUp{
+    0%{transform:translateY(0) scale(.9) rotate(0deg); opacity:0;}
+    10%{opacity:1;}
+    100%{transform:translateY(-120vh) scale(1.35) rotate(22deg); opacity:0;}
+  }
+
+  #confetti{ position:fixed; inset:0; z-index:50; pointer-events:none; }
+
+  #musicOverlay{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.55);
+    display:flex; align-items:center; justify-content:center;
+    z-index:100; padding:24px;
+  }
+
+  .overlayCard{
+    max-width:520px; width:100%;
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.25);
+    backdrop-filter: blur(10px);
+    border-radius:18px;
+    padding:18px;
+    text-align:center;
+    color:#fff;
+    box-shadow:0 18px 45px rgba(0,0,0,.25);
+  }
+
+  .overlayCard h2{ margin:0 0 10px; font-size:20px; }
+
+  #startMusicBtn{
+    width:100%;
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:18px;
+    background:linear-gradient(135deg, #ff5f8a, #ff2d55);
+    color:#fff;
+    font-weight:700;
+    box-shadow:0 12px 28px rgba(0,0,0,.25);
+  }
+
+  #finalScreen{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:200;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 18px;
+    color:#fff;
+  }
+
+  #finalScreen p{
+    font-size: 22px;
+    margin-top: 10px;
     color: #fff;
     text-shadow: 2px 2px 5px #000;
-    text-align: center;
-    padding: 0 16px;
-  }
-
-  #buttons {
-    margin-top: 30px;
-    position: relative;
-    width: 100%;
-    height: 200px;
-  }
-
-  button {
-    font-size: 20px;
-    padding: 15px 30px;
-    margin: 10px;
-    border: none;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, padding 0.15s ease;
-  }
-
-  #yes {
-    background: linear-gradient(135deg, #28a745, #7CFC00);
-    color: white;
-    font-weight: bold;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-    animation: pulse 1.2s infinite;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  #yes:hover {
-    transform: translateX(-50%) scale(1.05);
-    box-shadow: 0 14px 32px rgba(0,0,0,0.35);
-  }
-
-  @keyframes pulse {
-    0%   { transform: translateX(-50%) scale(1.0); }
-    50%  { transform: translateX(-50%) scale(1.04); }
-    100% { transform: translateX(-50%) scale(1.0); }
-  }
-
-  #no {
-    background-color: #f44336;
-    color: white;
-    position: absolute;
-    left: 50%;
-    top: 85px;
-    transform: translateX(-50%);
-  }
-
-  #toast {
-    position: fixed;
-    top: 20px;
-    background: rgba(0,0,0,0.75);
-    color: #fff;
-    padding: 12px 18px;
-    border-radius: 12px;
-    font-size: 16px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-  }
-
-  #toast.show {
-    opacity: 1;
+    font-weight: normal;
   }
 </style>
 </head>
 
 <body>
+  <div id="hearts"></div>
+  <canvas id="confetti"></canvas>
 
-<h1>💖 Susy, ¿Quieres ser mi San Valentín? 💖</h1>
+  <audio id="bgm" preload="auto" loop playsinline>
+    <source src="Married%20Life%20-%20UP.m4a" type="audio/mp4">
+  </audio>
 
-<div id="buttons">
-  <button id="yes" onclick="yesClick()">Sí 💘</button>
-  <button id="no">No 💔</button>
-</div>
+  <h1 id="mainTitle">💖 Susy, ¿Quieres ser mi San Valentín? 💖</h1>
 
-<div id="toast">Error</div>
+  <div id="buttons">
+    <button id="yes">Sí 💘</button>
+    <button id="no">No 💔</button>
+  </div>
+
+  <div id="toast"></div>
+
+  <div id="musicOverlay">
+    <div class="overlayCard">
+      <h2>🎶 Música 🎶</h2>
+      <button id="startMusicBtn">Activar Música</button>
+    </div>
+  </div>
+
+  <div id="finalScreen">
+    <div>
+      <h1>💖 ¡Gracias Amor! 💖</h1>
+      <p>💐 Te quiero mucho Piniweenie 💐</p>
+    </div>
+  </div>
 
 <script>
-let yesSize = 20;
-let yesPadding = 30;
+  let yesSize = 20;
+  let yesPadding = 30;
+  const MAX_YES_SIZE = 42;
+  const MAX_YES_PADDING = 50;
+  let noClicks = 0;
+  let noIsEscaping = false;
 
-const MAX_YES_SIZE = 42;
-const MAX_YES_PADDING = 50;
+  const noButton = document.getElementById("no");
+  const yesButton = document.getElementById("yes");
+  const toast = document.getElementById("toast");
+  const buttonsArea = document.getElementById("buttons");
+  const mainTitle = document.getElementById("mainTitle");
+  const finalScreen = document.getElementById("finalScreen");
+  const musicOverlay = document.getElementById("musicOverlay");
+  const startMusicBtn = document.getElementById("startMusicBtn");
+  const bgm = document.getElementById("bgm");
 
-let noClicks = 0;
-let noIsEscaping = false;
+  bgm.volume = 0.25;
 
-const noButton = document.getElementById("no");
-const yesButton = document.getElementById("yes");
-const toast = document.getElementById("toast");
-const buttonsArea = document.getElementById("buttons");
-
-function showToast(msg) {
-  toast.textContent = msg;
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 900);
-}
-
-function makeYesMoreLlamativo(extra = 4) {
-  yesSize = Math.min(yesSize + extra, MAX_YES_SIZE);
-  yesPadding = Math.min(yesPadding + 4, MAX_YES_PADDING);
-
-  yesButton.style.fontSize = yesSize + "px";
-  yesButton.style.padding = "15px " + yesPadding + "px";
-
-  yesButton.style.transform = "translateX(-50%) scale(1.06)";
-  setTimeout(() => {
-    yesButton.style.transform = "translateX(-50%) scale(1.0)";
-  }, 140);
-}
-
-function clamp(val, min, max) {
-  return Math.min(Math.max(val, min), max);
-}
-
-function moveNo() {
-  const margin = 10;
-
-  const areaRect = buttonsArea.getBoundingClientRect();
-  const btnRect = noButton.getBoundingClientRect();
-
-  const maxX = areaRect.width - btnRect.width - margin;
-  const maxY = areaRect.height - btnRect.height - margin;
-
-  const x = Math.random() * maxX + margin;
-  const y = Math.random() * maxY + margin;
-
-  noButton.style.left = clamp(x, margin, maxX + margin) + "px";
-  noButton.style.top = clamp(y, margin, maxY + margin) + "px";
-  noButton.style.transform = "none";
-
-  makeYesMoreLlamativo(3);
-}
-
-function enableNoEscapeMode() {
-  if (noIsEscaping) return;
-  noIsEscaping = true;
-
-  noButton.addEventListener("mouseenter", moveNo);
-  noButton.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    moveNo();
-  }, { passive: false });
-}
-
-noButton.addEventListener("click", (e) => {
-  e.preventDefault();
-  noClicks++;
-
-  if (noClicks === 1) {
-    showToast("Error 😅");
-    makeYesMoreLlamativo(4);
-    return;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 900);
   }
 
-  if (noClicks === 2) {
-    showToast("¿De verdad? 💔");
+  function makeYesMoreLlamativo(extra = 4){
+    yesSize = Math.min(yesSize + extra, MAX_YES_SIZE);
+    yesPadding = Math.min(yesPadding + 4, MAX_YES_PADDING);
+    yesButton.style.fontSize = yesSize + "px";
+    yesButton.style.padding = "15px " + yesPadding + "px";
+    yesButton.style.transform = "translateX(-50%) scale(1.06)";
+    setTimeout(() => yesButton.style.transform = "translateX(-50%) scale(1.0)", 140);
+  }
+
+  function clamp(val, min, max){ return Math.min(Math.max(val, min), max); }
+
+  function moveNo(){
+    const margin = 10;
+    const areaRect = buttonsArea.getBoundingClientRect();
+    const btnRect = noButton.getBoundingClientRect();
+    const maxX = areaRect.width - btnRect.width - margin;
+    const maxY = areaRect.height - btnRect.height - margin;
+    const x = Math.random() * maxX + margin;
+    const y = Math.random() * maxY + margin;
+
+    noButton.style.left = clamp(x, margin, maxX + margin) + "px";
+    noButton.style.top  = clamp(y, margin, maxY + margin) + "px";
+    noButton.style.transform = "none";
     makeYesMoreLlamativo(3);
-    return;
   }
 
-  enableNoEscapeMode();
-  moveNo();
-});
+  function enableNoEscapeMode(){
+    if(noIsEscaping) return;
+    noIsEscaping = true;
+    noButton.addEventListener("mouseenter", moveNo);
+    noButton.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      moveNo();
+    }, { passive:false });
+  }
 
-function yesClick() {
-  document.body.innerHTML = `
-    <h1>¡Gracias Amor!</h1>
-    <p style="font-size:22px; color:#fff; text-shadow: 1px 1px 3px #000; text-align:center; padding: 0 16px;">
-      💐 Te quiero mucho Piniweenie 💐
-    </p>
-  `;
-}
+  noButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    noClicks++;
+    if(noClicks === 1){ showToast("Error 😅"); makeYesMoreLlamativo(4); return; }
+    if(noClicks === 2){ showToast("¿De verdad? 💔"); makeYesMoreLlamativo(3); return; }
+    if(noClicks === 3){ showToast("Ándele 😅"); makeYesMoreLlamativo(3); return; }
+    enableNoEscapeMode();
+    moveNo();
+  });
+
+  const heartsContainer = document.getElementById("hearts");
+  const heartEmojis = ["💖","💘","💕","💗","💓","💞","❤️"];
+  function rand(min, max){ return Math.random() * (max - min) + min; }
+
+  function spawnHeart(){
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+    heart.style.left = rand(2,98) + "vw";
+    heart.style.fontSize = rand(16,34) + "px";
+    heart.style.animationDuration = rand(4.5,8.5) + "s";
+    heartsContainer.appendChild(heart);
+    setTimeout(() => heart.remove(), 9000);
+  }
+
+  setInterval(spawnHeart, 260);
+
+  startMusicBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    try{
+      bgm.currentTime = 0;
+      await bgm.play();
+      musicOverlay.style.display = "none";
+    }catch{
+      showToast("No se pudo reproducir");
+    }
+  });
+
+  yesButton.addEventListener("click", () => {
+    setTimeout(() => {
+      mainTitle.style.display = "none";
+      buttonsArea.style.display = "none";
+      finalScreen.style.display = "flex";
+    }, 650);
+  });
 </script>
 
 </body>
